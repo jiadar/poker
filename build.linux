@@ -1,7 +1,7 @@
 #!/bin/bash
-PROJ_PATH=/Users/ross/work/brian/lispevaulator
+PROJ_PATH=/Users/ross/work/brian/poker
 pushd $PROJ_PATH 
-javac $PROJ_PATH/src/PJ2/*.java -d bin/PJ2
-java -cp $PROJ_PATH/bin/PJ2:$PROJ_PATH/bin PJ2.LispExprEvaluator
+javac $PROJ_PATH/src/PJ4/*.java -d bin
+java -cp $PROJ_PATH/bin/PJ4:$PROJ_PATH/bin PJ4.VideoPoker
 popd 
 
