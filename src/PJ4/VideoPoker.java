@@ -96,56 +96,74 @@ public class VideoPoker {
    {
       if (check_royal_flush()) {
          System.out.println("Royal Flush");
+         calc_winnings(multipliers[8]);
          return;
       }
 
       if (check_straight_flush()) {
          System.out.println("Straight Flush");         
+         calc_winnings(multipliers[7]);
          return;
       }
 
       if (check_of_kind(4)) {
          System.out.println("Four of a kind");
+         calc_winnings(multipliers[6]);
          return;
       }
 
       if (check_full_house()) {
          System.out.println("Full House");
+         calc_winnings(multipliers[5]);
          return;
       }
 
       if (check_flush())  {
          System.out.println("Flush");
+         calc_winnings(multipliers[4]);
          return;
       }
 
       if (check_straight()) {       
          System.out.println("Straight");
+         calc_winnings(multipliers[3]);
          return;
       }
       
       if (check_of_kind(3)) {
          System.out.println("Three of a kind");
+         calc_winnings(multipliers[2]);
          return;
       }
 
       if (check_two_pairs()) {
          System.out.println("Two Pairs");
+         calc_winnings(multipliers[1]);
          return;
       }
       
       if (check_of_kind(2)) {
          System.out.println("One Pair");
+         calc_winnings(multipliers[0]);
          return;
       }
 
       System.out.println("You lost! \n") ;
+      take_money();
 
       return;
 
    }
 
-   boolean check_flush() {
+   private void calc_winnings(int m) {
+      playerBalance = playerBalance + m * playerBet;
+   }
+
+   private void take_money() {
+      playerBalance = playerBalance - playerBet;
+   }
+   
+   private boolean check_flush() {
       int suit = playerHand.get(0).getSuit();
 
       for (int i=0; i<5; i++) {
@@ -280,33 +298,72 @@ public class VideoPoker {
     *
     *************************************************/
 
+   public void play_loop() {
 
+// Steps:
+// 		showPayoutTable()
+// 		++	
+// 		show balance, get bet 
+// 	verify bet value, update balance
+// 	reset deck, shuffle deck, 
+// 	deal cards and display cards
+// 	ask for positions of cards to replace 
+//          get positions in one input line
+// 	update cards
+// 	check hands, display proper messages
+// 	update balance if there is a payout
+
+      
+// 	if balance = O:
+// 		end of program 
+
+      while(playerBalance >= 0) {
+         Scanner reader = new Scanner(System.in);
+         showPayoutTable();
+         System.out.println("Balance: " + playerBalance);
+         System.out.println("Enter Bet: ");
+         int bet = reader.nextInt();
+         gameDeck.reset();
+         gameDeck.shuffle();
+         playerHand = new ArrayList<Card>();
+         for (int i=0; i<5; i++) {
+            playerHand.add(gameDeck.deal(1).get(0));
+         }
+         System.out.println("What positions to replace? ");
+         String replace = reader.nextLine();
+         List<String> replace_list = Arrays.asList(replace.split(","));
+         while(! replace_list.isEmpty()) {
+            int pos = Integer.valueOf(replace_list.get(0));
+            playerHand.set(pos-1, gameDeck.deal(1).get(0));
+         }
+         checkHands();
+         
+      }
+
+   }
 
    public void play() 
    {
-      /** The main algorithm for single player poker game 
-       *
-       * Steps:
-       * 		showPayoutTable()
-       *
-       * 		++	
-       * 		show balance, get bet 
-       *		verify bet value, update balance
-       *		reset deck, shuffle deck, 
-       *		deal cards and display cards
-       *		ask for positions of cards to replace 
-       *          get positions in one input line
-       *		update cards
-       *		check hands, display proper messages
-       *		update balance if there is a payout
-       *		if balance = O:
-       *			end of program 
-       *		else
-       *			ask if the player wants to play a new game
-       *			if the answer is "no" : end of program
-       *			else : showPayoutTable() if user wants to see it
-       *			goto ++
-       */
+      Scanner s = new Scanner(System.in);
+      String playAgain = "yes";
+      
+      while (! playAgain.equals("no")) {
+         play_loop();
+         System.out.println("Game over.");
+         System.out.println("Do you want to play again? (yes/no): ");
+         String playAgain = reader.nextLine();
+         if (playAgain.equals("no") {
+               // print payout table  
+            }
+      }
+      
+//  The main algorithm for single player poker game 
+// 	else
+// 		ask if the player wants to play a new game
+// 		if the answer is "no" : end of program
+// 		else : showPayoutTable() if user wants to see it
+// 		goto ++
+
 
 
       // implement this method!
