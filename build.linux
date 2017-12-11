@@ -2,6 +2,6 @@
 PROJ_PATH=/Users/ross/work/brian/poker
 pushd $PROJ_PATH 
 javac $PROJ_PATH/src/PJ4/*.java -d bin
-java -cp $PROJ_PATH/bin/PJ4:$PROJ_PATH/bin PJ4.VideoPoker
+java -cp $PROJ_PATH/bin/PJ4:$PROJ_PATH/bin TestVideoPoker
 popd 
 

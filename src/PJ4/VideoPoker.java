@@ -175,7 +175,7 @@ public class VideoPoker {
       return true;
    }
 
-   List<Integer> sorted_ranks() {
+   private List<Integer> sorted_ranks() {
       List<Integer> ranks = new ArrayList<Integer>();
 
       for (int i=0; i<5; i++) {
@@ -186,7 +186,7 @@ public class VideoPoker {
       return ranks;
    }
    
-   boolean check_royal_flush() {
+   private boolean check_royal_flush() {
 
       if (! check_flush()) {
          return false;
@@ -211,7 +211,7 @@ public class VideoPoker {
       return true;
    }
 
-   int next_consecutive_card(int i) {
+   private int next_consecutive_card(int i) {
       int n = i + 1;
       if (n > 13) {          // may need to test for jokers
          n = 1;
@@ -219,7 +219,7 @@ public class VideoPoker {
       return n;
    }
    
-   boolean check_straight_flush() {
+   private boolean check_straight_flush() {
 
       if (! check_flush()) {
          return false;
@@ -233,7 +233,7 @@ public class VideoPoker {
 
    }
 
-   int frequency(int c) {
+   private int frequency(int c) {
       // count frequency of rank, of one card in the hand
       
       List<Integer> ranks = sorted_ranks();
@@ -248,7 +248,7 @@ public class VideoPoker {
       return count;
    }
 
-   boolean check_of_kind(int k) {
+   private boolean check_of_kind(int k) {
       List<Integer> ranks = sorted_ranks();
       for (int i=0; i<5; i++) {
          if (frequency(ranks.get(i)) == k) {
@@ -259,12 +259,12 @@ public class VideoPoker {
    }
    
 
-   boolean check_full_house() {
+   private boolean check_full_house() {
       return (check_of_kind(3) && check_of_kind(2));
    }
 
 
-   boolean check_straight() {
+   private boolean check_straight() {
       List<Integer> ranks = sorted_ranks();
       int n = ranks.get(0);
 
@@ -297,49 +297,72 @@ public class VideoPoker {
     *   add new private methods here ....
     *
     *************************************************/
-
-   public void play_loop() {
-
-// Steps:
-// 		showPayoutTable()
-// 		++	
-// 		show balance, get bet 
-// 	verify bet value, update balance
-// 	reset deck, shuffle deck, 
-// 	deal cards and display cards
-// 	ask for positions of cards to replace 
-//          get positions in one input line
-// 	update cards
-// 	check hands, display proper messages
-// 	update balance if there is a payout
-
+   private void get_bet() {
+      Scanner reader = new Scanner(System.in);
+      do {
+         System.out.print("Enter Bet: ");
+         String bet_str = reader.nextLine();
+         playerBet = Integer.valueOf(bet_str);
+      } while (playerBet > playerBalance);
       
-// 	if balance = O:
-// 		end of program 
+      System.out.println("Your Bet is $" + playerBet);
+         
+   }
 
-      while(playerBalance >= 0) {
-         Scanner reader = new Scanner(System.in);
-         showPayoutTable();
-         System.out.println("Balance: " + playerBalance);
-         System.out.println("Enter Bet: ");
-         int bet = reader.nextInt();
-         gameDeck.reset();
-         gameDeck.shuffle();
-         playerHand = new ArrayList<Card>();
-         for (int i=0; i<5; i++) {
+   private void deal_hand() {
+      gameDeck.reset();
+      gameDeck.shuffle();
+      playerHand = new ArrayList<Card>();
+
+      for (int i=0; i<5; i++) {
+         try {
             playerHand.add(gameDeck.deal(1).get(0));
          }
-         System.out.println("What positions to replace? ");
-         String replace = reader.nextLine();
-         List<String> replace_list = Arrays.asList(replace.split(","));
-         while(! replace_list.isEmpty()) {
-            int pos = Integer.valueOf(replace_list.get(0));
-            playerHand.set(pos-1, gameDeck.deal(1).get(0));
+         catch (PlayingCardException e) {
+            System.out.println("Could not deal from game deck.");
          }
-         checkHands();
-         
+      }
+      System.out.println("Hand: " + playerHand.toString());
+
+   }
+
+   private void replace_cards() {
+      Scanner reader = new Scanner(System.in);
+      System.out.print("What positions to replace? ");
+      String replace = reader.nextLine();
+      replace = replace.replaceAll(" ","");
+      if (replace.length()!=0) {
+         Stack<String> replace_stack = new Stack<String>(); 
+         replace_stack.addAll(Arrays.asList(replace.split(",")));
+        
+         while(! replace_stack.isEmpty()) {
+            int pos = Integer.valueOf(replace_stack.pop());
+            try {
+               playerHand.set(pos-1, gameDeck.deal(1).get(0));
+            }
+            catch (PlayingCardException e) {
+               System.out.println("Could not deal from game deck.");
+            }
+         }
+         System.out.println("New Hand: " + playerHand.toString());
       }
 
+   }
+   
+   public void play_loop() {
+
+      this.playerBalance= startingBalance;
+      gameDeck.reset();
+
+      while(playerBalance > 0) {
+         showPayoutTable();
+         System.out.println("Balance: " + playerBalance);
+
+         get_bet();
+         deal_hand();
+         replace_cards();         
+         checkHands();         
+      }
    }
 
    public void play() 
@@ -350,13 +373,17 @@ public class VideoPoker {
       while (! playAgain.equals("no")) {
          play_loop();
          System.out.println("Game over.");
-         System.out.println("Do you want to play again? (yes/no): ");
-         String playAgain = reader.nextLine();
-         if (playAgain.equals("no") {
-               // print payout table  
+         System.out.print("Do you want to play again? (yes/no): ");
+         playAgain = s.nextLine();
+         if (playAgain.equals("no")) {
+            System.out.print("Do you want to see the payout table? (yes/no): ");
+            String resp = s.nextLine();
+            if (resp.equals("yes")) {
+               showPayoutTable();
             }
+         }     
       }
-      
+   }
 //  The main algorithm for single player poker game 
 // 	else
 // 		ask if the player wants to play a new game
@@ -368,7 +395,7 @@ public class VideoPoker {
 
       // implement this method!
 
-   }
+            
 
    /****************************************************************
     /* Do not modify methods below
